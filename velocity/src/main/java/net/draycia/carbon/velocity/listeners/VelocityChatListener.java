@@ -39,6 +39,8 @@ import net.draycia.carbon.common.listeners.ChatListenerInternal;
 import net.draycia.carbon.common.messages.CarbonMessages;
 import net.draycia.carbon.velocity.CarbonVelocityBootstrap;
 import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.apache.logging.log4j.Logger;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -112,7 +114,7 @@ public final class VelocityChatListener extends ChatListenerInternal implements 
 
         final CarbonPlayer sender = this.userManager.user(event.getPlayer().getUniqueId()).join();
 
-        final String content = event.getResult().getMessage().orElse(event.getMessage());
+        final String content = GsonComponentSerializer.builder().build().serialize(Component.text(event.getResult().getMessage().orElse(event.getMessage())));
         final @Nullable CarbonChatEventImpl chatEvent = this.prepareAndEmitChatEvent(sender, content, null);
 
         if (chatEvent == null || chatEvent.cancelled()) {

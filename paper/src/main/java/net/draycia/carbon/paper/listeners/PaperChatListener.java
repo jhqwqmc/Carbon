@@ -29,7 +29,7 @@ import net.draycia.carbon.common.listeners.ChatListenerInternal;
 import net.draycia.carbon.common.messages.CarbonMessages;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.identity.Identity;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -62,7 +62,7 @@ public final class PaperChatListener extends ChatListenerInternal implements Lis
             return;
         }
 
-        final String content = PlainTextComponentSerializer.plainText().serialize(event.message());
+        final String content = GsonComponentSerializer.builder().build().serialize(event.message());
         final @Nullable CarbonChatEventImpl chatEvent = this.prepareAndEmitChatEvent(sender, content, event.signedMessage());
 
         if (chatEvent == null || chatEvent.cancelled()) {

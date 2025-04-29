@@ -31,15 +31,13 @@ import net.draycia.carbon.common.config.ConfigManager;
 import net.draycia.carbon.common.event.events.CarbonChatEventImpl;
 import net.draycia.carbon.common.event.events.CarbonEarlyChatEvent;
 import net.draycia.carbon.common.messages.CarbonMessages;
-import net.draycia.carbon.common.messages.TagPermissions;
-import net.draycia.carbon.common.users.WrappedCarbonPlayer;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.chat.SignedMessage;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentIteratorType;
 import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.framework.qual.DefaultQualifier;
@@ -62,9 +60,9 @@ public abstract class ChatListenerInternal {
     }
 
     protected @Nullable CarbonChatEventImpl prepareAndEmitChatEvent(final CarbonPlayer sender, final String messageContent, final @Nullable SignedMessage signedMessage) {
-        final CarbonPlayer.ChannelMessage channelMessage = sender.channelForMessage(Component.text(messageContent));
+        final CarbonPlayer.ChannelMessage channelMessage = sender.channelForMessage(GsonComponentSerializer.builder().build().deserialize(messageContent));
         final ChatChannel channel = channelMessage.channel();
-        final String message = PlainTextComponentSerializer.plainText().serialize(channelMessage.message());
+        final String message = GsonComponentSerializer.builder().build().serialize(channelMessage.message());
 
         return this.prepareAndEmitChatEvent(sender, message, signedMessage, channel);
     }
@@ -97,13 +95,8 @@ public abstract class ChatListenerInternal {
 
         content = earlyChatEvent.message();
 
-        final Component message;
+        final Component message = GsonComponentSerializer.builder().build().deserialize(content);
 
-        if (sender instanceof WrappedCarbonPlayer wrapped) {
-            message = wrapped.parseMessageTags(content);
-        } else {
-            message = TagPermissions.parseTags(TagPermissions.MESSAGE, content, sender::hasPermission);
-        }
         if (probablyBlank(message)) {
             return null;
         }

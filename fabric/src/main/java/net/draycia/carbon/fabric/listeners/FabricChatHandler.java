@@ -70,7 +70,7 @@ public class FabricChatHandler extends ChatListenerInternal implements ServerMes
 
         final @Nullable CarbonPlayer sender = this.carbonChat.userManager().user(serverPlayer.getUUID()).join();
 
-        final String content = chatMessage.decoratedContent().getString();
+        final String content = net.minecraft.network.chat.Component.Serializer.toJson(chatMessage.decoratedContent(), serverPlayer.registryAccess());
         final @Nullable CarbonChatEventImpl chatEvent = this.prepareAndEmitChatEvent(sender, content, null);
 
         if (chatEvent == null || chatEvent.cancelled()) {
